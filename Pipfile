@@ -4,10 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-certifi = "==2021.10.8"
+certifi = "==2022.5.18"
 commonmark = "==0.9.1"
 distlib = "==0.3.4"
 filelock = "==3.7.0"
+lxml = "==4.8.0"
 numpy = "==1.22.3"
 pandas = "==1.4.2"
 pipenv = "==2022.5.2"

@@ -29,7 +29,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
         )
     else:
         print(
-            f"Fetching standings/table data for {subleague} ({start_year} - {end_year - 1})..."
+            f"Fetching standings/table data for [bold green]{subleague.upper()}[/bold green] ({start_year} - {end_year - 1})..."
         )
 
     seasons = [*range(start_year, end_year, 1)]
@@ -177,6 +177,10 @@ def combine_data(subdir, subleague):
         all_csv_files = [i for i in glob.glob("*.{}".format("csv"))]
         combined_dfs = pd.concat([pd.read_csv(f) for f in all_csv_files])
         combined_dfs.to_csv(f"{subleague}-ALL.csv", index=False, encoding="utf-8")
+        # Removes extra headers
+        cleaned_df = pd.read_csv(f"{subleague}-ALL.csv", header=[1])
+        cleaned_df = cleaned_df[cleaned_df.W != "W"]
+        cleaned_df.to_csv(f"{subleague}-ALL.csv", index=False)
         os.chdir(cwd)
 
     else:
