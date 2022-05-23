@@ -6,6 +6,7 @@
 This script scrapes the standings/table data from Sports.Reference.com for the following leagues:
 
 - The Big 5 European Football Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)
+- The CFL (1945 - 2021)
 - MLB (History of all current active franchises)
 - NBA (All franchises 1947-2021)
 - NFL (History of all current active franchises)

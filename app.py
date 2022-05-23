@@ -1,6 +1,8 @@
 import glob
 import os
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
@@ -44,7 +46,19 @@ def getLeague(subdir, start_year, end_year, league, subleague):
 
         while not progress.finished:
             for year in seasons:
-                if league == "big5":
+
+                if league == "CFL":
+                    # 2020 season was cancelled
+                    if year == 2020:
+                        pass
+                    else:
+                        url = f"https://www.statscrew.com/football/standings/l-CFL/y-{year}"
+                        response = requests.get(url)
+                        soup = BeautifulSoup(response.text, "html.parser")
+                        table = soup.findAll("table", {"class": "sortable"})
+                        df = pd.read_html(str(table))
+
+                elif league == "big5":
                     df = pd.read_html(
                         f"https://fbref.com/en/comps/Big5/{year - 1}-{year}/{year - 1}-{year}-Big-5-European-Leagues-Stats"
                     )
@@ -137,19 +151,22 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                     sleep(1)
 
                 else:
-                    df = df[0].to_csv(
-                        f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv",
-                        index=False,
-                    )
+                    if league == "CFL" and year == 2020:
+                        pass
+                    else:
+                        df = df[0].to_csv(
+                            f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv",
+                            index=False,
+                        )
 
-                    # Add Date col to all files
-                    year_df = pd.read_csv(
-                        f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv"
-                    )
-                    year_df["yearId"] = year
-                    year_df.to_csv(
-                        f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv"
-                    )
+                        # Add Date col to all files
+                        year_df = pd.read_csv(
+                            f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv"
+                        )
+                        year_df["yearId"] = year
+                        year_df.to_csv(
+                            f"{cwd}/scraped_data/{subdir}/{subleague}-{year}.csv"
+                        )
 
                     progress.update(task, advance=1)
                     sleep(1)
@@ -169,6 +186,25 @@ def combine_data(subdir, subleague):
         all_csv_files = [i for i in glob.glob("*.{}".format("csv"))]
         combined_dfs = pd.concat([pd.read_csv(f) for f in all_csv_files])
         combined_dfs.to_csv(f"{subleague}-ALL.csv", index=False, encoding="uft-8")
+        os.chdir(cwd)
+
+    elif subdir == "CFL":
+        print(f"...done! Combining data into {subleague}-ALL.csv...\n")
+        os.chdir(f"{cwd}/scraped_data/{subdir}/")
+        all_csv_files = [i for i in glob.glob("*.{}".format("csv"))]
+        combined_dfs = pd.concat([pd.read_csv(f) for f in all_csv_files])
+        combined_dfs.to_csv(f"{subleague}-ALL.csv", index=False, encoding="utf-8")
+        # Removes extra headers
+        cleaned_df = pd.read_csv(f"{subleague}-ALL.csv", header=[0])
+        cleaned_df = cleaned_df[cleaned_df.Team != "East Division"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "North Division"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "South Division"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "Eastern Conference"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "West Division"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "Western Conference"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "Interprovincial Rugby Football Union"]
+        cleaned_df = cleaned_df[cleaned_df.Team != "Western Interprovincial Football Union"]
+        cleaned_df.to_csv(f"{subleague}-ALL.csv", index=False)
         os.chdir(cwd)
 
     elif subdir == "NCAAF":
@@ -207,23 +243,31 @@ if __name__ == "__main__":
 
     league = int(
         console.input(
-            "\nWhich league(s) do you want to scrape standings/table data for?:\n"
-            "1) [green]Major League Baseball[/green]\n"
-            "2) National Basketball Association\n"
-            "3) [green]National Football League[/green]\n"
-            "4) National Hockey League\n"
-            "5) [green]NCAA Football Division 1[/green]\n"
-            "6) The Big 5 European Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)\n"
+            "\n[cyan]Which league(s) do you want to scrape standings/table data for?[/cyan]:\n"
+            "1) The Canadian Football League\n"
+            "2) [green]Major League Baseball[/green]\n"
+            "3) National Basketball Association\n"
+            "4) [green]National Football League[/green]\n"
+            "5) National Hockey League\n"
+            "6) [green]NCAA Football Division 1[/green]\n"
+            "7) The Big 5 European Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)\n"
         )
     )
 
     if league == 1:
+        if not os.path.exists(f"{cwd}/scraped_data/CFL"):
+            os.makedirs(f"{cwd}/scraped_data/CFL")
+
+        getLeague("CFL", 1945, latest_season, "CFL", "CFL")
+        combine_data("CFL", "CFL")
+
+    elif league == 2:
         if not os.path.exists(f"{cwd}/scraped_data/MLB"):
             os.makedirs(f"{cwd}/scraped_data/MLB")
 
         getLeague("MLB", 2020, latest_season, "MLB", "MLB")
 
-    elif league == 2:
+    elif league == 3:
         if not os.path.exists(f"{cwd}/scraped_data/NBA"):
             os.makedirs(f"{cwd}/scraped_data/NBA")
 
@@ -232,19 +276,19 @@ if __name__ == "__main__":
         getLeague("NBA", 1950, latest_season, "NBA", "NBA")
         combine_data("NBA", "NBA")
 
-    elif league == 3:
+    elif league == 4:
         if not os.path.exists(f"{cwd}/scraped_data/NFL"):
             os.makedirs(f"{cwd}/scraped_data/NFL")
 
         getLeague("NFL", 1918, latest_season, "NFL", "NFL")
 
-    elif league == 4:
+    elif league == 5:
         if not os.path.exists(f"{cwd}/scraped_data/NHL"):
             os.makedirs(f"{cwd}/scraped_data/NHL")
 
         getLeague("NHL", 1918, latest_season, "NHL", "NHL")
 
-    elif league == 5:
+    elif league == 6:
         if not os.path.exists(f"{cwd}/scraped_data/NCAAF"):
             os.makedirs(f"{cwd}/scraped_data/NCAAF")
 
@@ -311,7 +355,7 @@ if __name__ == "__main__":
         getLeague("NCAAF", 1962, latest_season, "NCAAF", "wac")
         combine_data("NCAAF", "wac")
 
-    elif league == 6:
+    elif league == 7:
         if not os.path.exists(f"{cwd}/scraped_data/big5"):
             os.makedirs(f"{cwd}/scraped_data/big5")
 
