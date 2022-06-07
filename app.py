@@ -185,7 +185,7 @@ def combine_data(subdir, subleague):
         os.chdir(f"{cwd}/scraped_data/{subdir}/")
         all_csv_files = [i for i in glob.glob("*.{}".format("csv"))]
         combined_dfs = pd.concat([pd.read_csv(f) for f in all_csv_files])
-        combined_dfs.to_csv(f"{subleague}-ALL.csv", index=False, encoding="uft-8")
+        combined_dfs.to_csv(f"{subleague}-ALL.csv", index=False)
         os.chdir(cwd)
 
     elif subdir == "CFL":
@@ -202,8 +202,12 @@ def combine_data(subdir, subleague):
         cleaned_df = cleaned_df[cleaned_df.Team != "Eastern Conference"]
         cleaned_df = cleaned_df[cleaned_df.Team != "West Division"]
         cleaned_df = cleaned_df[cleaned_df.Team != "Western Conference"]
-        cleaned_df = cleaned_df[cleaned_df.Team != "Interprovincial Rugby Football Union"]
-        cleaned_df = cleaned_df[cleaned_df.Team != "Western Interprovincial Football Union"]
+        cleaned_df = cleaned_df[
+            cleaned_df.Team != "Interprovincial Rugby Football Union"
+        ]
+        cleaned_df = cleaned_df[
+            cleaned_df.Team != "Western Interprovincial Football Union"
+        ]
         cleaned_df.to_csv(f"{subleague}-ALL.csv", index=False)
         os.chdir(cwd)
 
@@ -234,7 +238,7 @@ if __name__ == "__main__":
 
     console = Console()
 
-    # Must be one greater than the actual last season (i.e. 2022 if the latest season is latest_season)
+    # Must be one greater than the actual last season (i.e. 2022 if the latest season is 2021)
     # This is set as a var so it will be easier to update later.
     latest_season = 2022
 
@@ -359,7 +363,7 @@ if __name__ == "__main__":
         if not os.path.exists(f"{cwd}/scraped_data/big5"):
             os.makedirs(f"{cwd}/scraped_data/big5")
 
-        getLeague("big5", 1996, latest_season, "big5", "big5")
+        getLeague("big5", 1996, 2023, "big5", "big5")
         combine_data("big5", "big5")
 
     print(
