@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
-from team_ids import mlb_team_ids, nfl_team_ids, nhl_team_ids
+from team_ids import mlb_team_ids, nfl_team_ids, nhl_team_ids, wnba_team_ids
 from time import sleep
 
 
@@ -73,7 +73,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         )
 
                         progress.update(task, advance=1)
-                        sleep(1)
+                        sleep(5)
 
                 elif league == "NFL":
 
@@ -86,7 +86,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         )
 
                         progress.update(task, advance=1)
-                        sleep(1)
+                        sleep(5)
 
                 elif league == "NHL":
 
@@ -99,12 +99,24 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         )
 
                         progress.update(task, advance=1)
-                        sleep(1)
+                        sleep(5)
 
                 elif league == "NBA":
                     df = pd.read_html(
                         f"https://www.basketball-reference.com/leagues/{subleague}_{year}.html"
                     )
+
+                elif league == "WNBA":
+                    for team in wnba_team_ids:
+                        df = pd.read_html(
+                            f"https://www.basketball-reference.com/wnba/teams/{team}/"
+                        )
+                        df = df[0].to_csv(
+                            f"{cwd}/scraped_data/{subdir}/{team}.csv", index=False
+                        )
+
+                        progress.update(task, advance=1)
+                        sleep(5)
 
                 elif league == "NCAAF":
                     df = pd.read_html(
@@ -127,7 +139,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                     )
 
                     progress.update(task, advance=1)
-                    sleep(1)
+                    sleep(5)
 
                 elif league == "MLB" or league == "NFL" or league == "NHL":
                     return None
@@ -148,7 +160,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                     )
 
                     progress.update(task, advance=1)
-                    sleep(1)
+                    sleep(5)
 
                 else:
                     if league == "CFL" and year == 2020:
@@ -169,7 +181,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         )
 
                     progress.update(task, advance=1)
-                    sleep(1)
+                    sleep(5)
 
 
 def combine_data(subdir, subleague):
@@ -255,6 +267,7 @@ if __name__ == "__main__":
             "5) National Hockey League\n"
             "6) [green]NCAA Football Division 1[/green]\n"
             "7) The Big 5 European Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)\n"
+            "8) [green]Women's National Basketball Association [/green]\n"
         )
     )
 
@@ -365,6 +378,14 @@ if __name__ == "__main__":
 
         getLeague("big5", 1996, 2023, "big5", "big5")
         combine_data("big5", "big5")
+
+    elif league == 8:
+        if not os.path.exists(f"{cwd}/scraped_data/WNBA"):
+            os.makedirs(f"{cwd}/scraped_data/WNBA")
+
+        getLeague("WNBA", 1997, latest_season, "WNBA", "WNBA")
+        combine_data("WNBA", "WNBA")
+
 
     print(
         f"[green]Complete![/green] Data can be found in: [cyan]{cwd}/scraped_data/[/cyan]\n"

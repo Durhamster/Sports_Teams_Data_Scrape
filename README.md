@@ -8,10 +8,11 @@ This script scrapes the standings/table data from Sports.Reference.com for the f
 - The Big 5 European Football Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)
 - The CFL (1945 - 2021)
 - MLB (History of all current active franchises)
-- NBA (All franchises 1947-2021)
+- NBA (All franchises 1947 - 2021)
 - NFL (History of all current active franchises)
 - NHL (History of all current active franchises)
 - NCAA Division 1 Football (Dates Vary By Conference)
+- WNBA (All franchises 1997 - 2021)
 
 ## Installing Libraries & Usage
 

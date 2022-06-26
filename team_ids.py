@@ -100,3 +100,24 @@ nhl_team_ids = [
     "WSH",
     "WPG",
 ]
+
+wnba_team_ids = [
+    "ATL",
+    "CHI",
+    "CON",
+    "IND",
+    "LAS",
+    "MIN",
+    "NYL",
+    "PHO",
+    "SAS",
+    "SEA",
+    "TUL",
+    "WAS",
+    "CHA",
+    "CLE",
+    "HOU",
+    "MIA",
+    "POR",
+    "SAC"
+]
