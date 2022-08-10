@@ -11,6 +11,7 @@ This script scrapes the standings/table data from Sports.Reference.com for the f
 - NBA (All franchises 1947 - 2021)
 - NFL (History of all current active franchises)
 - NHL (History of all current active franchises)
+- NRL (1998 - 2021)
 - NCAA Division 1 Football (Dates Vary By Conference)
 - WNBA (All franchises 1997 - 2021)
 

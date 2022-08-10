@@ -75,6 +75,11 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         progress.update(task, advance=1)
                         sleep(5)
 
+                elif league == "NBA":
+                    df = pd.read_html(
+                        f"https://www.basketball-reference.com/leagues/{subleague}_{year}.html"
+                    )
+
                 elif league == "NFL":
 
                     for team in nfl_team_ids:
@@ -101,10 +106,8 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                         progress.update(task, advance=1)
                         sleep(5)
 
-                elif league == "NBA":
-                    df = pd.read_html(
-                        f"https://www.basketball-reference.com/leagues/{subleague}_{year}.html"
-                    )
+                elif league == "NRL":
+                    df = pd.read_html(f"https://www.rugbyleagueproject.org/seasons/nrl-{year}/summary.html")
 
                 elif league == "WNBA":
                     for team in wnba_team_ids:
@@ -163,6 +166,7 @@ def getLeague(subdir, start_year, end_year, league, subleague):
                     sleep(5)
 
                 else:
+                    # There was no CFL season in 2020
                     if league == "CFL" and year == 2020:
                         pass
                     else:
@@ -268,6 +272,7 @@ if __name__ == "__main__":
             "6) [green]NCAA Football Division 1[/green]\n"
             "7) The Big 5 European Leagues (Bundesliga, La Liga, Ligue 1, Premier, Serie A)\n"
             "8) [green]Women's National Basketball Association [/green]\n"
+            "9) National Rugby League\n",
         )
     )
 
@@ -385,6 +390,13 @@ if __name__ == "__main__":
 
         getLeague("WNBA", 1997, latest_season, "WNBA", "WNBA")
         combine_data("WNBA", "WNBA")
+
+    elif league == 9:
+        if not os.path.exists(f"{cwd}/scraped_data/NRL"):
+            os.makedirs(f"{cwd}/scraped_data/NRL")
+
+        getLeague("NRL", 1998, latest_season, "NRL", "NRL")
+        combine_data("NRL", "NRL")
 
 
     print(
