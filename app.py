@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
     # Must be one greater than the actual last season (i.e. 2022 if the latest season is 2021)
     # This is set as a var so it will be easier to update later.
-    latest_season = 2022
+    latest_season = 2023
 
     if not os.path.exists(f"{cwd}/scraped_data"):
         os.makedirs(f"{cwd}/scraped_data")
